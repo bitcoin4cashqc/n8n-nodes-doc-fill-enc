@@ -32,6 +32,14 @@ const nodeOperationOptions: INodeProperties[] = [
 			'Name of the binary property for the output',
 	},
 	{
+		displayName: 'Ignore Encryption',
+		name: 'ignoreEncryption',
+		type: 'boolean',
+		default: false,
+		description:
+			'Whether to ignore encryption when loading the PDF document',
+	},
+	{
 		displayName: 'Configuration JSON',
 		name: 'configurationJson',
 		type: 'json',
@@ -65,6 +73,7 @@ export class DocCreateField implements INodeType {
 		let itemBinaryData: IBinaryKeyData;
 		let dataPropertyName: string;
 		let dataPropertyNameOut: string;
+		let ignoreEncryption: boolean;
 		let jsonString: string;
 		let docCreateFieldConfigs: DocCreateFieldConfig[];
 		let docBinaryData: IBinaryData;
@@ -76,6 +85,7 @@ export class DocCreateField implements INodeType {
 		for (let itemIndex = 0; itemIndex < items.length; itemIndex++) {
 				dataPropertyName = this.getNodeParameter('dataPropertyName', itemIndex, '') as string;
 				dataPropertyNameOut = this.getNodeParameter('dataPropertyNameOut', itemIndex, '') as string;
+				ignoreEncryption = this.getNodeParameter('ignoreEncryption', itemIndex, false) as boolean;
 				jsonString = this.getNodeParameter('configurationJson', itemIndex, '') as string;
 
 			try {
@@ -91,7 +101,7 @@ export class DocCreateField implements INodeType {
 				}
 
 				docBuffer = await this.helpers.getBinaryDataBuffer(itemIndex, dataPropertyName);
-				pdfDoc = await PDFDocument.load(docBuffer);
+				pdfDoc = await PDFDocument.load(docBuffer, { ignoreEncryption });
 
 
 				docCreateFieldConfigs = JSON.parse(jsonString);
